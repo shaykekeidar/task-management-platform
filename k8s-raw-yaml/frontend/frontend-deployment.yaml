@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: shaykekeidar/kub-demo-frontend:10
+        image: shaykekeidar/kub-demo-frontend:11
         env:
           - name: FRONTEND_VERSION
             valueFrom:
@@ -30,6 +30,8 @@ spec:
           limits: # for auto scaling - HPA configuration , maximum request
             cpu: "500m" 
             memory: "512Mi"
+
+
 
 
 

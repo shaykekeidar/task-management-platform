@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: frontend-config
 data:
-  FRONTEND_VERSION: "10"
+  FRONTEND_VERSION: "11"
+

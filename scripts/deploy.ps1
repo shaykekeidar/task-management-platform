@@ -151,38 +151,35 @@ Write-Host ""
 
 Write-Host "Checking if Docker tag already exists in registry..."
 
-if (Test-DockerTagExists -Image $Image) {
-    Write-Error "Docker image tag already exists: $Image"
-    Write-Host ""
-    Write-Host "Update the version in:"
-    Write-Host "  $VersionFile"
-    Write-Host ""
-    Write-Host "Example:"
-    Write-Host "  $Application=$([int]$Version + 1)"
-    exit 1
+$ImageAlreadyExists = Test-DockerTagExists -Image $Image
+
+if ($ImageAlreadyExists) {
+    Write-Host "Docker image tag already exists: $Image"
+    Write-Host "Skipping Docker build and push. Continuing with Kubernetes deployment..."
 }
+else {
+    Write-Host "Tag is new. Building and pushing image..."
 
-Write-Host "Tag is new. Continuing..."
+    Push-Location $AppFolder
 
-Push-Location $AppFolder
+    docker build -t $Image .
 
-docker build -t $Image .
+    if ($LASTEXITCODE -ne 0) {
+        Pop-Location
+        Write-Error "Docker build failed"
+        exit 1
+    }
 
-if ($LASTEXITCODE -ne 0) {
+    docker push $Image
+
+    if ($LASTEXITCODE -ne 0) {
+        Pop-Location
+        Write-Error "Docker push failed"
+        exit 1
+    }
+
     Pop-Location
-    Write-Error "Docker build failed"
-    exit 1
 }
-
-docker push $Image
-
-if ($LASTEXITCODE -ne 0) {
-    Pop-Location
-    Write-Error "Docker push failed"
-    exit 1
-}
-
-Pop-Location
 
 # Update image in Deployment YAML
 $content = Get-Content $DeploymentFile -Raw
