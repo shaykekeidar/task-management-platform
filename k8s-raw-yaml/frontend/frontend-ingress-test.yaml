@@ -5,10 +5,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - frontend.local
+        - task-generator-test.local
       secretName: frontend-tls
+
   rules:
-    - host: frontend.local
+    - host: task-generator-test.local
       http:
         paths:
           - path: /
