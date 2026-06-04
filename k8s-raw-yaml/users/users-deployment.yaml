@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # who should this deployment manage
+      app: users
+  template: # the pod configuration
+    metadata:
+      labels:
+        app: users
+    spec:
+      containers: # The container configuration
+      - name: users
+        image: shaykekeidar/kub-demo-users:4
+        env:
+          - name: USERS_VERSION
+            value: "4"
+          - name: AUTH_ADDRESS
+            value: "auth-service.default"
+            #value: "10.110.206.12" # the ip of the network svc object that doesn't delete on deleting deployment
+
+
+
+
+
+
+
+
+
+
+
+

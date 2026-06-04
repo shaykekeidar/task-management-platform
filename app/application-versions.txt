@@ -1,0 +1,4 @@
+users=4
+auth=2
+tasks=5
+frontend=10

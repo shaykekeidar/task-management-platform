@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # who should this deployment manage
+      app: tasks
+  template: # the pod configuration
+    metadata:
+      labels:
+        app: tasks
+    spec:
+      containers: # The container configuration
+      - name: tasks
+        image: shaykekeidar/kub-demo-tasks:5
+        env:
+          - name: TASKS_VERSION
+            value: "5"
+          - name: TASKS_FOLDER
+            value: "tasks"
+
+          - name: AUTH_ADDRESS
+            value: "auth-service.default"
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"
+
+
+
+
+
+
+

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: shaykekeidar/kub-demo-frontend:10
+        env:
+          - name: FRONTEND_VERSION
+            valueFrom:
+              configMapKeyRef:
+                name: frontend-config
+                key: FRONTEND_VERSION
+        ports:
+        - containerPort: 80
+        resources:
+          requests: # for auto scaling - HPA configuration , minimum request
+            cpu: "100m"
+            memory: "128Mi"
+          limits: # for auto scaling - HPA configuration , maximum request
+            cpu: "500m" 
+            memory: "512Mi"
+
+
+
+
+
+
+
+
+
