@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-deployment
+spec:
+  replicas: {{ .Values.tasks.replicas }}
+  selector:
+    matchLabels:
+      app: tasks
+  template:
+    metadata:
+      labels:
+        app: tasks
+    spec:
+      containers:
+        - name: tasks
+          image: "{{ .Values.tasks.image.repository }}:{{ .Values.tasks.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.tasks.service.targetPort }}

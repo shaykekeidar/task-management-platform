@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+
+data:
+  FRONTEND_VERSION: "{{ .Values.frontend.config.FRONTEND_VERSION }}"
