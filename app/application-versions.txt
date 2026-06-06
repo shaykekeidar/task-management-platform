@@ -1,4 +1,4 @@
 users=6
 auth=4
-tasks=7
+tasks=9
 frontend=14

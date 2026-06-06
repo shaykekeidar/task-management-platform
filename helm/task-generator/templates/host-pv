@@ -10,5 +10,5 @@ spec:
     accessModes:
       - ReadWriteOnce # multiple pods but must be on the same node
     hostPath: 
-      path: /data
+      path: {{ .Values.tasks.persistence.hostPath }}
       type: DirectoryOrCreate

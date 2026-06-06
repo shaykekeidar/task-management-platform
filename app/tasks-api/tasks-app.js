@@ -7,6 +7,14 @@ const axios = require('axios');
 const tasksFolder = process.env.TASKS_FOLDER || 'tasks';
 const filePath = path.join(__dirname, tasksFolder, 'tasks.db');
 
+//
+// Create tasks.db automatically if it doesn't exist
+//
+if (!fs.existsSync(filePath)) {
+  console.log(`Creating task database file: ${filePath}`);
+  fs.writeFileSync(filePath, '');
+}
+
 const app = express();
 
 app.get('/versions', function (req, res) {
@@ -48,13 +56,18 @@ app.get('/tasks', async (req, res) => {
     fs.readFile(filePath, (err, data) => {
       if (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Loading the tasks failed.' });
+        return res.status(500).json({
+          message: 'Loading the tasks failed.'
+        });
       }
 
       const strData = data.toString();
 
       if (!strData.trim()) {
-        return res.status(200).json({ message: 'Tasks loaded.', tasks: [] });
+        return res.status(200).json({
+          message: 'Tasks loaded.',
+          tasks: []
+        });
       }
 
       const entries = strData.split('TASK_SPLIT');
@@ -64,11 +77,17 @@ app.get('/tasks', async (req, res) => {
         .filter((json) => json.trim() !== '')
         .map((json) => JSON.parse(json));
 
-      res.status(200).json({ message: 'Tasks loaded.', tasks: tasks });
+      res.status(200).json({
+        message: 'Tasks loaded.',
+        tasks: tasks
+      });
     });
   } catch (err) {
     console.log(err);
-    return res.status(401).json({ message: err.message || 'Failed to load tasks.' });
+
+    return res.status(401).json({
+      message: err.message || 'Failed to load tasks.'
+    });
   }
 });
 
@@ -79,21 +98,37 @@ app.post('/tasks', async (req, res) => {
     const text = req.body.text;
     const title = req.body.title;
 
-    const task = { title, text };
+    const task = {
+      title,
+      text
+    };
+
     const jsonTask = JSON.stringify(task);
 
     fs.appendFile(filePath, jsonTask + 'TASK_SPLIT', (err) => {
       if (err) {
         console.log(err);
-        return res.status(500).json({ message: 'Storing the task failed.' });
+
+        return res.status(500).json({
+          message: 'Storing the task failed.'
+        });
       }
 
-      res.status(201).json({ message: 'Task stored.', createdTask: task });
+      res.status(201).json({
+        message: 'Task stored.',
+        createdTask: task
+      });
     });
   } catch (err) {
     console.log(err);
-    return res.status(401).json({ message: 'Could not verify token.' });
+
+    return res.status(401).json({
+      message: 'Could not verify token.'
+    });
   }
 });
 
-app.listen(8000);
+app.listen(8000, () => {
+  console.log(`Tasks API started`);
+  console.log(`Database file: ${filePath}`);
+});
