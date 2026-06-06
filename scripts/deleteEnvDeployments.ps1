@@ -16,6 +16,18 @@ if (-not $Environment) {
     exit 1
 }
 
+Write-Host ""
+Write-Host "WARNING!"
+Write-Host "This will delete all deployments in namespace: $Namespace"
+Write-Host ""
+
+$Answer = Read-Host "Continue? (yes/no)"
+
+if ($Answer.ToLower() -ne "yes") {
+    Write-Host "Operation cancelled."
+    exit 0
+}
+
 $Namespace = "task-generator-$Environment"
 
 Write-Host "Deleting deployments from namespace: $Namespace"
