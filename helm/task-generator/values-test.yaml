@@ -30,6 +30,8 @@ users:
   image:
     repository: shaykekeidar/kub-demo-users
     tag: "1"
+  config:
+    USERS_VERSION: "1" # defualt tag
   service:
     port: 8080
     targetPort: 8080
@@ -39,6 +41,8 @@ auth:
   image:
     repository: shaykekeidar/kub-demo-auth
     tag: "1"
+  config:
+    AUTH_VERSION: "1" # defualt tag
   service:
     port: 80
     targetPort: 80
@@ -48,6 +52,8 @@ tasks:
   image:
     repository: shaykekeidar/kub-demo-tasks
     tag: "1"
+  config:
+    AUTH_VERSION: "1" # defualt tag
   service:
     port: 8000
     targetPort: 8000
