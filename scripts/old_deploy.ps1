@@ -5,7 +5,6 @@ param(
     [ValidateSet("dev", "test")]
     [string]$Environment = "dev"
 )
-
 function Show-Help {
     Write-Host ""
     Write-Host "========================================"
@@ -31,7 +30,7 @@ function Test-DockerTagExists {
     return ($LASTEXITCODE -eq 0)
 }
 
-function Ensure-NamespaceExists {
+#function Ensure-NamespaceExists { Not in use
     param([string]$Namespace)
 
     kubectl get namespace $Namespace *> $null

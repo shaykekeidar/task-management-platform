@@ -1,0 +1,186 @@
+Task Generator - Deployment Manual
+Architecture
+
+This project uses:
+
+Docker for application packaging
+Helm for Kubernetes deployments
+PowerShell for CI/CD automation
+Kubernetes namespaces for environment separation
+
+Namespaces:
+
+task-generator-dev
+task-generator-test
+
+Applications:
+
+frontend
+users
+auth
+tasks
+Version Management
+
+Application versions are stored in:
+
+app\application-versions.txt
+
+Example:
+
+users=1
+auth=1
+tasks=1
+frontend=11
+
+Before releasing a new version:
+
+Update the relevant version number.
+Save the file.
+Run the appropriate deployment script.
+
+Script Overview
+################## buildImage.ps1 ##################
+
+Purpose:
+
+Builds and pushes a Docker image.
+
+Flow:
+
+Reads version from application-versions.txt
+Builds Docker image
+Pushes image to Docker Hub
+
+Example:
+
+.\buildImage.ps1 frontend
+
+Result:
+
+shaykekeidar/kub-demo-frontend:11
+
+Use when:
+
+You only want to build and push an image.
+You do not want to deploy yet.
+
+################## deployHelm.ps1 ##################
+
+Purpose:
+
+Deploys a specific version using Helm.
+
+Flow:
+
+Select environment
+Override image tag using Helm --set
+Execute helm upgrade --install
+
+Examples:
+
+.\deployHelm.ps1 frontend dev 11
+
+.\deployHelm.ps1 frontend test 11
+
+Use when:
+
+Image already exists in Docker Hub.
+You only want to deploy.
+
+
+
+##################  release.ps1 ##################
+
+Purpose:
+
+Complete CI/CD flow.
+
+Flow:
+
+Build image
+Push image
+Deploy with Helm
+
+Examples:
+
+.\release.ps1 frontend dev
+
+.\release.ps1 frontend test
+
+Use when:
+
+Releasing a new version.
+Normal day-to-day deployment.
+
+This is the recommended script.
+
+Helm
+
+Helm chart location:
+
+helm\task-generator
+
+Main files:
+
+Chart.yaml
+
+values-dev.yaml
+
+values-test.yaml
+
+Templates:
+
+frontend-deployment.yaml
+frontend-service.yaml
+frontend-configmap.yaml
+frontend-ingress.yaml
+frontend-hpa.yaml
+
+users-deployment.yaml
+users-service.yaml
+
+auth-deployment.yaml
+auth-service.yaml
+
+tasks-deployment.yaml
+tasks-service.yaml
+
+Verification
+
+Show all resources:
+
+kubectl get all -A
+
+Show dev environment:
+
+kubectl get all -n task-generator-dev
+
+Show test environment:
+
+kubectl get all -n task-generator-test
+
+Show ingress:
+
+kubectl get ingress -A
+
+Show HPA:
+
+kubectl get hpa -A
+
+Access URLs
+
+Development:
+
+https://task-generator-dev.local
+
+Testing:
+
+https://task-generator-test.local
+
+Future Improvements
+Helm deployment for TLS secret
+Persistent Volume support
+CI pipeline in Jenkins or GitHub Actions
+ArgoCD GitOps deployment
+Production namespace
+Separate production cluster
