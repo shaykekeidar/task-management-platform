@@ -30,7 +30,7 @@ function Test-DockerTagExists {
     return ($LASTEXITCODE -eq 0)
 }
 
-#function Ensure-NamespaceExists { Not in use
+function Ensure-NamespaceExists {
     param([string]$Namespace)
 
     kubectl get namespace $Namespace *> $null
