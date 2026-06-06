@@ -3,10 +3,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Values.tasks.persistence.claimName }}
 spec:
-  volumeName: host-pv
-  storageClassName: standard
+  volumeName: {{ .Values.tasks.persistence.pvName }}
+  storageClassName: {{ .Values.tasks.persistence.storageClassName }}
   accessModes:
     - ReadWriteOnce
-  resources: 
+  resources:
     requests:
-      storage: 20Mi
+      storage: {{ .Values.tasks.persistence.storage }}

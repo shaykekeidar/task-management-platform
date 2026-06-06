@@ -60,5 +60,6 @@ tasks:
   persistence:
     pvName: host-pv-test
     claimName: host-pvc-test
+    storageClassName: standard
     hostPath: /data/task-generator-test/tasks
     storage: 20Mi
