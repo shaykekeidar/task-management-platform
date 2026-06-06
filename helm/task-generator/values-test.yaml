@@ -4,9 +4,9 @@ frontend:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-frontend
-    tag: "11"
+    tag: "latest"
   config:
-    FRONTEND_VERSION: "11"
+    FRONTEND_VERSION: "latest"
   ingress:
     host: task-generator-test.local
     tlsSecretName: frontend-tls
@@ -29,9 +29,9 @@ users:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-users
-    tag: "1"
+    tag: "latest"
   config:
-    USERS_VERSION: "1" # defualt tag
+    USERS_VERSION: "latest"
   service:
     port: 8080
     targetPort: 8080
@@ -40,9 +40,9 @@ auth:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-auth
-    tag: "1"
+    tag: "latest"
   config:
-    AUTH_VERSION: "1" # defualt tag
+    AUTH_VERSION: "latest"
   service:
     port: 80
     targetPort: 80
@@ -51,9 +51,9 @@ tasks:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-tasks
-    tag: "1"
+    tag: "latest"
   config:
-    AUTH_VERSION: "1" # defualt tag
+    TASKS_VERSION: "latest"
   service:
     port: 8000
     targetPort: 8000
