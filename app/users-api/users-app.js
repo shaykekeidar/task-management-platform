@@ -26,24 +26,10 @@ app.post('/signup', async (req, res) => {
     //const hashedPW = 'dummy string';
 
     const hashedPW = await axios.get(`http://${process.env.AUTH_ADDRESS}/hashed-password/` + password);
-     //const hashedPW = await axios.get(`http://${process.env.AUTH_SERVICE_SERVICE_HOST}/hashed-password/` + password);
 
     // // since it's a dummy service, we don't really care for the hashed-pw either
      console.log(hashedPW, email);
      res.status(201).json({ message: 'User created!' });
-   
-   
-   // const hashedPWResponse = await axios.get(
-  //`http://${process.env.AUTH_ADDRESS}/hashed-password/` + password
-
-  //const hashedPWResponse = await axios.get(
-  //`http://${process.env.AUTH_SERVICE_SERVICE_HOST}/hashed-password/` + password
-
-//);
-
-  // const hashedPassword = hashedPWResponse.data.hashedPassword;
-
-  // console.log(hashedPassword, email);
 
 res.status(201).json({ message: 'User created!' });
   } catch (err) {
