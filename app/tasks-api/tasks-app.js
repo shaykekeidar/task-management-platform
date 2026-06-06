@@ -6,6 +6,15 @@ const axios = require('axios');
 const filePath = path.join(__dirname, process.env.TASKS_FOLDER, 'tasks.txt');
 const app = express();
 
+app.get('/versions', function (req, res) {
+  res.json({
+    frontend: process.env.FRONTEND_VERSION || 'unknown',
+    tasks: process.env.TASKS_VERSION || 'unknown',
+    users: process.env.USERS_VERSION || 'unknown',
+    auth: process.env.AUTH_VERSION || 'unknown'
+  });
+});
+
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {

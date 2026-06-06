@@ -4,6 +4,18 @@ import './App.css';
 import TaskList from './components/TaskList';
 import NewTask from './components/NewTask';
 
+const [versions, setVersions] = useState({});
+
+const fetchVersions = useCallback(function () {
+  fetch('/api/versions')
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (jsonData) {
+      setVersions(jsonData);
+    });
+}, []);
+
 function App() {
   const [tasks, setTasks] = useState([]);
 
@@ -21,12 +33,13 @@ function App() {
       });
   }, []);
 
-  useEffect(
-    function () {
-      fetchTasks();
-    },
-    [fetchTasks]
-  );
+useEffect(
+  function () {
+    fetchTasks();
+    fetchVersions();
+  },
+  [fetchTasks, fetchVersions]
+);
 
   function addTaskHandler(task) {
     fetch('/api/tasks', {
@@ -54,6 +67,12 @@ function App() {
       <section>
         <button onClick={fetchTasks}>Fetch Tasks</button>
         <TaskList tasks={tasks} />
+      </section>
+      <section>
+        <h3>Application Versions</h3>
+        <p>Tasks: {versions.tasks}</p>
+        <p>Users: {versions.users}</p>
+        <p>Auth: {versions.auth}</p>
       </section>
     </div>
   );

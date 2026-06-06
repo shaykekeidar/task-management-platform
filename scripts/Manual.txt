@@ -39,6 +39,7 @@ Save the file.
 Run the appropriate deployment script.
 
 Script Overview
+
 ################## buildImage.ps1 ##################
 
 Purpose:
@@ -52,6 +53,8 @@ Builds Docker image
 Pushes image to Docker Hub
 
 Example:
+
+usage: auth, frontend, tasks, users
 
 .\buildImage.ps1 frontend
 

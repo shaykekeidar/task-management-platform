@@ -1,4 +1,4 @@
-users=4
-auth=2
-tasks=5
-frontend=11
+users=5
+auth=3
+tasks=6
+frontend=12

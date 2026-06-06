@@ -68,4 +68,10 @@ app.post('/login', async (req, res) => {
   return res.status(response.status).json({ message: 'Logging in failed!' });
 });
 
+app.get('/version', function (req, res) {
+  res.json({
+    users: process.env.USERS_VERSION || 'unknown'
+  });
+});
+
 app.listen(8080);

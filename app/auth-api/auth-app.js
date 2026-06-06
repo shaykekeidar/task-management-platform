@@ -33,4 +33,10 @@ app.get('/hashed-password/:password', (req, res) => {
   res.status(200).json({ hashedPassword: hashedPassword });
 });
 
+app.get('/version', function (req, res) {
+  res.json({
+    auth: process.env.AUTH_VERSION || 'unknown'
+  });
+});
+
 app.listen(80);
