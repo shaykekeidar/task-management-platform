@@ -84,17 +84,40 @@ switch ($Application) {
 }
 
 $Image = "$DockerRepo`:$Version"
+$LatestImage = "$DockerRepo`:latest"
 
 docker manifest inspect $Image *> $null
 
 if ($LASTEXITCODE -eq 0) {
+
     Write-Host "Image already exists: $Image"
+    Write-Host "Updating latest tag..."
+
+    docker pull $Image
+
+    if ($LASTEXITCODE -ne 0) {
+        exit 1
+    }
+
+    docker tag $Image $LatestImage
+
+    if ($LASTEXITCODE -ne 0) {
+        exit 1
+    }
+
+    docker push $LatestImage
+
+    if ($LASTEXITCODE -ne 0) {
+        exit 1
+    }
+
+    Write-Host "Latest tag updated: $LatestImage"
     exit 0
 }
 
 Push-Location $AppFolder
 
-docker build -t $Image .
+docker build -t $Image -t $LatestImage .
 
 if ($LASTEXITCODE -ne 0) {
     Pop-Location
@@ -108,6 +131,15 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+docker push $LatestImage
+
+if ($LASTEXITCODE -ne 0) {
+    Pop-Location
+    exit 1
+}
+
 Pop-Location
 
+Write-Host ""
 Write-Host "Image built and pushed: $Image"
+Write-Host "Latest tag updated: $LatestImage"

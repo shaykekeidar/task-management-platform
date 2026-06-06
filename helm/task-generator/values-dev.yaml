@@ -62,4 +62,4 @@ tasks:
     claimName: host-pvc-dev
     storageClassName: standard
     hostPath: /data/task-generator-dev/tasks
-    storage: 15Mi
+    storage: 20Mi
