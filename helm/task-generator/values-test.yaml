@@ -63,3 +63,17 @@ tasks:
     storageClassName: standard
     hostPath: /data/task-generator-test/tasks
     storage: 20Mi
+postgres:
+  image:
+    repository: postgres
+    tag: "17"
+
+  database: tasksdb
+  user: taskuser
+  password: taskpass
+
+  service:
+    port: 5432
+
+  storage:
+    size: 1Gi
