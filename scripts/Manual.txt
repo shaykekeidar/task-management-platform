@@ -54,7 +54,7 @@ Pushes image to Docker Hub
 
 Example:
 
-usage: auth, frontend, tasks, users
+usage: auth, frontend, tasks, users, all
 
 .\buildImage.ps1 frontend
 

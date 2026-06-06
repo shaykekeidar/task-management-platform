@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.tasks.persistence.claimName }}
+spec:
+  volumeName: host-pv
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources: 
+    requests:
+      storage: 20Mi

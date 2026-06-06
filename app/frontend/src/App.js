@@ -4,20 +4,9 @@ import './App.css';
 import TaskList from './components/TaskList';
 import NewTask from './components/NewTask';
 
-const [versions, setVersions] = useState({});
-
-const fetchVersions = useCallback(function () {
-  fetch('/api/versions')
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (jsonData) {
-      setVersions(jsonData);
-    });
-}, []);
-
 function App() {
   const [tasks, setTasks] = useState([]);
+  const [versions, setVersions] = useState({});
 
   const fetchTasks = useCallback(function () {
     fetch('/api/tasks', {
@@ -33,13 +22,23 @@ function App() {
       });
   }, []);
 
-useEffect(
-  function () {
-    fetchTasks();
-    fetchVersions();
-  },
-  [fetchTasks, fetchVersions]
-);
+  const fetchVersions = useCallback(function () {
+    fetch('/api/versions')
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonData) {
+        setVersions(jsonData);
+      });
+  }, []);
+
+  useEffect(
+    function () {
+      fetchTasks();
+      fetchVersions();
+    },
+    [fetchTasks, fetchVersions]
+  );
 
   function addTaskHandler(task) {
     fetch('/api/tasks', {
@@ -64,19 +63,21 @@ useEffect(
       <section>
         <NewTask onAddTask={addTaskHandler} />
       </section>
+
       <section>
         <button onClick={fetchTasks}>Fetch Tasks</button>
         <TaskList tasks={tasks} />
       </section>
+
       <section>
         <h3>Application Versions</h3>
-        <p>Tasks: {versions.tasks}</p>
-        <p>Users: {versions.users}</p>
-        <p>Auth: {versions.auth}</p>
+        <p>Frontend: {versions.frontend || 'unknown'}</p>
+        <p>Tasks: {versions.tasks || 'unknown'}</p>
+        <p>Users: {versions.users || 'unknown'}</p>
+        <p>Auth: {versions.auth || 'unknown'}</p>
       </section>
     </div>
   );
 }
-
 
 export default App;

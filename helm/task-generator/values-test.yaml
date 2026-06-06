@@ -57,3 +57,8 @@ tasks:
   service:
     port: 8000
     targetPort: 8000
+  persistence:
+    pvName: host-pv-test
+    claimName: host-pvc-test
+    hostPath: /data/task-generator-test/tasks
+    storage: 20Mi

@@ -17,15 +17,25 @@ spec:
           image: "{{ .Values.tasks.image.repository }}:{{ .Values.tasks.image.tag }}"
           ports:
             - containerPort: {{ .Values.tasks.service.targetPort }}
-      env:
-        - name: TASKS_VERSION
-          value: "{{ .Values.tasks.image.tag }}"
+          volumeMounts:
+            - mountPath: /app/tasks
+              name: tasks-volume 
+          env:
+          - name: TASKS_VERSION
+            value: "{{ .Values.tasks.image.tag }}"
 
-        - name: USERS_VERSION
-          value: "{{ .Values.users.image.tag }}"
+          - name: USERS_VERSION
+            value: "{{ .Values.users.image.tag }}"
 
-        - name: AUTH_VERSION
-          value: "{{ .Values.auth.image.tag }}"
+          - name: AUTH_VERSION
+            value: "{{ .Values.auth.image.tag }}"
 
-        - name: FRONTEND_VERSION
-          value: "{{ .Values.frontend.image.tag }}"
+          - name: FRONTEND_VERSION
+            value: "{{ .Values.frontend.image.tag }}"
+
+          - name: TASKS_FOLDER
+            value: "tasks"
+      volumes: 
+        - name: tasks-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.tasks.persistence.claimName }}
