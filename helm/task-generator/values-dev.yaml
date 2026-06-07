@@ -40,7 +40,7 @@ auth:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-auth
-    tag: "56"
+    tag: "6"
   config:
     AUTH_VERSION: "6"
   service:
