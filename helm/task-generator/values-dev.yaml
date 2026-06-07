@@ -82,5 +82,5 @@ migration:
   enabled: true
   jobName: tasks-file-to-postgres-migration-v1
   oldPvcClaimName: host-pvc-dev
-  oldDataMountPath: /old-data
+  oldDataMountPath: /data/task-generator-dev/tasks
   oldFileName: text.txt
