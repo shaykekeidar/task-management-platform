@@ -1,0 +1,87 @@
+{{- if .Values.migration.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.migration.jobName }}
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+
+      containers:
+        - name: migrate-tasks
+          image: postgres:17
+
+          env:
+            - name: PGHOST
+              value: postgres
+
+            - name: PGPORT
+              value: "{{ .Values.postgres.service.port }}"
+
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+
+            - name: OLD_DATA_FILE
+              value: "{{ .Values.migration.oldDataMountPath }}/{{ .Values.migration.oldFileName }}"
+
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+
+              echo "Creating tasks table if not exists..."
+
+              psql <<'SQL'
+              CREATE TABLE IF NOT EXISTS tasks (
+                id SERIAL PRIMARY KEY,
+                task_text TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+              );
+              SQL
+
+              echo "Checking old data file: $OLD_DATA_FILE"
+
+              if [ ! -f "$OLD_DATA_FILE" ]; then
+                echo "Old data file not found: $OLD_DATA_FILE"
+                exit 1
+              fi
+
+              echo "Migrating file lines into PostgreSQL..."
+
+              while IFS= read -r line || [ -n "$line" ]; do
+                if [ -n "$line" ]; then
+                  psql -c "INSERT INTO tasks (task_text) VALUES (\$\$$line\$\$);"
+                fi
+              done < "$OLD_DATA_FILE"
+
+              echo "Migration completed."
+
+              psql -c "SELECT * FROM tasks;"
+
+          volumeMounts:
+            - name: old-tasks-storage
+              mountPath: {{ .Values.migration.oldDataMountPath }}
+
+      volumes:
+        - name: old-tasks-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.migration.oldPvcClaimName }}
+{{- end }}

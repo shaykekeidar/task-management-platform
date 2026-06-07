@@ -77,3 +77,10 @@ postgres:
 
   storage:
     size: 1Gi
+
+migration:
+  enabled: true
+  jobName: tasks-file-to-postgres-migration-v1
+  oldPvcClaimName: host-pvc-dev
+  oldDataMountPath: /old-data
+  oldFileName: text.txt
