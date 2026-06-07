@@ -51,9 +51,9 @@ tasks:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-tasks
-    tag: "10"
+    tag: "11"
   config:
-    TASKS_VERSION: "10"
+    TASKS_VERSION: "11"
   service:
     port: 8000
     targetPort: 8000
