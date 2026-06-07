@@ -79,7 +79,7 @@ postgres:
     size: 1Gi
 
 migration:
-  enabled: true
+  enabled: false
   jobName: tasks-file-to-postgres-migration-v1
   oldPvcClaimName: host-pvc-test
   oldDataMountPath: /app/tasks

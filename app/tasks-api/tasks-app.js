@@ -1,21 +1,30 @@
-const path = require('path');
-const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-
-const tasksFolder = process.env.TASKS_FOLDER || 'tasks';
-const filePath = path.join(__dirname, tasksFolder, 'tasks.db');
-
-//
-// Create tasks.db automatically if it doesn't exist
-//
-if (!fs.existsSync(filePath)) {
-  console.log(`Creating task database file: ${filePath}`);
-  fs.writeFileSync(filePath, '');
-}
+const { Pool } = require('pg');
 
 const app = express();
+
+const pool = new Pool({
+  host: process.env.DB_HOST || 'postgres',
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME || 'tasksdb',
+  user: process.env.DB_USER || 'taskuser',
+  password: process.env.DB_PASSWORD || 'taskpass'
+});
+
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tasks (
+      id SERIAL PRIMARY KEY,
+      title TEXT,
+      text TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  console.log('PostgreSQL tasks table is ready');
+}
 
 app.get('/versions', function (req, res) {
   res.json({
@@ -53,34 +62,13 @@ app.get('/tasks', async (req, res) => {
   try {
     await extractAndVerifyToken(req.headers);
 
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({
-          message: 'Loading the tasks failed.'
-        });
-      }
+    const result = await pool.query(
+      'SELECT id, title, text, created_at FROM tasks ORDER BY id'
+    );
 
-      const strData = data.toString();
-
-      if (!strData.trim()) {
-        return res.status(200).json({
-          message: 'Tasks loaded.',
-          tasks: []
-        });
-      }
-
-      const entries = strData.split('TASK_SPLIT');
-      entries.pop();
-
-      const tasks = entries
-        .filter((json) => json.trim() !== '')
-        .map((json) => JSON.parse(json));
-
-      res.status(200).json({
-        message: 'Tasks loaded.',
-        tasks: tasks
-      });
+    res.status(200).json({
+      message: 'Tasks loaded.',
+      tasks: result.rows
     });
   } catch (err) {
     console.log(err);
@@ -98,26 +86,20 @@ app.post('/tasks', async (req, res) => {
     const text = req.body.text;
     const title = req.body.title;
 
-    const task = {
-      title,
-      text
-    };
-
-    const jsonTask = JSON.stringify(task);
-
-    fs.appendFile(filePath, jsonTask + 'TASK_SPLIT', (err) => {
-      if (err) {
-        console.log(err);
-
-        return res.status(500).json({
-          message: 'Storing the task failed.'
-        });
-      }
-
-      res.status(201).json({
-        message: 'Task stored.',
-        createdTask: task
+    if (!text) {
+      return res.status(400).json({
+        message: 'Task text is required.'
       });
+    }
+
+    const result = await pool.query(
+      'INSERT INTO tasks (title, text) VALUES ($1, $2) RETURNING id, title, text, created_at',
+      [title, text]
+    );
+
+    res.status(201).json({
+      message: 'Task stored.',
+      createdTask: result.rows[0]
     });
   } catch (err) {
     console.log(err);
@@ -128,7 +110,14 @@ app.post('/tasks', async (req, res) => {
   }
 });
 
-app.listen(8000, () => {
-  console.log(`Tasks API started`);
-  console.log(`Database file: ${filePath}`);
-});
+initDb()
+  .then(() => {
+    app.listen(8000, () => {
+      console.log('Tasks API started');
+      console.log(`PostgreSQL host: ${process.env.DB_HOST || 'postgres'}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to initialize PostgreSQL:', err);
+    process.exit(1);
+  });
