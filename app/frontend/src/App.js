@@ -6,19 +6,36 @@ import NewTask from './components/NewTask';
 
 function App() {
   const [tasks, setTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
   const [versions, setVersions] = useState({});
+  const [showVersions, setShowVersions] = useState(false);
+  const [showCompletedTasks, setShowCompletedTasks] = useState(false);
 
   const fetchTasks = useCallback(function () {
     fetch('/api/tasks', {
       headers: {
-        'Authorization': 'Bearer abc'
+        Authorization: 'Bearer abc'
       }
     })
       .then(function (response) {
         return response.json();
       })
       .then(function (jsonData) {
-        setTasks(jsonData.tasks);
+        setTasks(jsonData.tasks || []);
+      });
+  }, []);
+
+  const fetchCompletedTasks = useCallback(function () {
+    fetch('/api/completed-tasks', {
+      headers: {
+        Authorization: 'Bearer abc'
+      }
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (jsonData) {
+        setCompletedTasks(jsonData.completedTasks || []);
       });
   }, []);
 
@@ -35,9 +52,10 @@ function App() {
   useEffect(
     function () {
       fetchTasks();
+      fetchCompletedTasks();
       fetchVersions();
     },
-    [fetchTasks, fetchVersions]
+    [fetchTasks, fetchCompletedTasks, fetchVersions]
   );
 
   function addTaskHandler(task) {
@@ -45,16 +63,31 @@ function App() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer abc',
+        Authorization: 'Bearer abc'
       },
-      body: JSON.stringify(task),
+      body: JSON.stringify(task)
     })
       .then(function (response) {
-        console.log(response);
         return response.json();
       })
-      .then(function (resData) {
-        console.log(resData);
+      .then(function () {
+        fetchTasks();
+      });
+  }
+
+  function completeTaskHandler(taskId) {
+    fetch(`/api/tasks/${taskId}/complete`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer abc'
+      }
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function () {
+        fetchTasks();
+        fetchCompletedTasks();
       });
   }
 
@@ -66,15 +99,36 @@ function App() {
 
       <section>
         <button onClick={fetchTasks}>Fetch Tasks</button>
-        <TaskList tasks={tasks} />
+        <TaskList tasks={tasks} onCompleteTask={completeTaskHandler} />
       </section>
 
       <section>
-        <h3>Application Versions</h3>
-        <p>Frontend: {versions.frontend || 'unknown'}</p>
-        <p>Tasks: {versions.tasks || 'unknown'}</p>
-        <p>Users: {versions.users || 'unknown'}</p>
-        <p>Auth: {versions.auth || 'unknown'}</p>
+        <button onClick={() => setShowCompletedTasks(!showCompletedTasks)}>
+          {showCompletedTasks ? 'Hide Completed Tasks' : 'Show Completed Tasks'}
+        </button>
+
+        {showCompletedTasks && (
+          <div>
+            <h3>Completed Tasks</h3>
+            <TaskList tasks={completedTasks} hideCompleteButton={true} />
+          </div>
+        )}
+      </section>
+
+      <section>
+        <button onClick={() => setShowVersions(!showVersions)}>
+          {showVersions ? 'Hide Versions' : 'Show Versions'}
+        </button>
+
+        {showVersions && (
+          <div>
+            <h3>Application Versions</h3>
+            <p>Frontend: {versions.frontend || 'unknown'}</p>
+            <p>Tasks: {versions.tasks || 'unknown'}</p>
+            <p>Users: {versions.users || 'unknown'}</p>
+            <p>Auth: {versions.auth || 'unknown'}</p>
+          </div>
+        )}
       </section>
     </div>
   );

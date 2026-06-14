@@ -6,6 +6,33 @@ param(
     [string]$Environment = "dev"
 )
 
+function Show-Usage {
+    Write-Host ""
+    Write-Host "Usage:"
+    Write-Host "  .\releaseApp.ps1 <application> [environment]"
+    Write-Host ""
+    Write-Host "Applications:"
+    Write-Host "  users"
+    Write-Host "  auth"
+    Write-Host "  tasks"
+    Write-Host "  frontend"
+    Write-Host ""
+    Write-Host "Environments:"
+    Write-Host "  dev   (default)"
+    Write-Host "  test"
+    Write-Host ""
+    Write-Host "Examples:"
+    Write-Host "  .\releaseApp.ps1 tasks"
+    Write-Host "  .\releaseApp.ps1 frontend dev"
+    Write-Host "  .\releaseApp.ps1 users test"
+    Write-Host ""
+}
+
+if (-not $Application) {
+    Show-Usage
+    exit 1
+}
+
 $RootPath = "D:\Kubernetes\kub-network-01-starting-setup"
 $VersionFile = "$RootPath\app\application-versions.txt"
 
@@ -25,6 +52,7 @@ if (-not $Version) {
 
 & "$RootPath\scripts\buildImage.ps1" $Application
 if ($LASTEXITCODE -ne 0) { exit 1 }
+
 
 Write-Host "Helm is disabled"
 #& "$RootPath\scripts\deployHelm.ps1" $Application $Environment $Version
