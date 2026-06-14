@@ -26,7 +26,8 @@ if (-not $Version) {
 & "$RootPath\scripts\buildImage.ps1" $Application
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
-& "$RootPath\scripts\deployHelm.ps1" $Application $Environment $Version
-if ($LASTEXITCODE -ne 0) { exit 1 }
+Write-Host "Helm is disabled"
+#& "$RootPath\scripts\deployHelm.ps1" $Application $Environment $Version
+#if ($LASTEXITCODE -ne 0) { exit 1 }
 
 Write-Host "Release completed: $Application $Environment version $Version"
