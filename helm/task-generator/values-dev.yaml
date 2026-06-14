@@ -4,9 +4,9 @@ frontend:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-frontend
-    tag: "16" # need copy manually from dev until script will do it.
+    tag: "17" # need copy manually from dev until script will do it.
   config:
-    FRONTEND_VERSION: "16"
+    FRONTEND_VERSION: "17"
   ingress:
     host: task-generator-dev.local
     tlsSecretName: frontend-tls
@@ -51,9 +51,9 @@ tasks:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-tasks
-    tag: "12"
+    tag: "13"
   config:
-    TASKS_VERSION: "12"
+    TASKS_VERSION: "13"
   service:
     port: 8000
     targetPort: 8000
