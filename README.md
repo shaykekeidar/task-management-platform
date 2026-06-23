@@ -11,5 +11,3 @@ Cloud-Native application demonstrating:
 • ArgoCD
 • GitOps
 • Horizontal Pod Autoscaling
-
-ואז 2–3 תמונות.
