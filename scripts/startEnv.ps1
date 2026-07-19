@@ -20,6 +20,54 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host ""
+Write-Host "Waiting for Minikube node..." -ForegroundColor Cyan
+
+kubectl wait --for=condition=Ready node/minikube --timeout=180s
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Minikube node did not become ready." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host ""
+Write-Host "Ensuring Minikube primary-node label..." -ForegroundColor Cyan
+
+kubectl label node minikube minikube.k8s.io/primary=true --overwrite
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Failed to configure Minikube node label." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host ""
+Write-Host "Enabling ingress addon..." -ForegroundColor Cyan
+
+minikube addons enable ingress
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Failed to enable the ingress addon." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host ""
+Write-Host "Waiting for ingress controller..." -ForegroundColor Cyan
+
+kubectl rollout status deployment/ingress-nginx-controller `
+    -n ingress-nginx `
+    --timeout=300s
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Ingress controller did not become ready." -ForegroundColor Red
+
+    kubectl get pods -n ingress-nginx -o wide
+    kubectl get events -n ingress-nginx `
+        --sort-by=.metadata.creationTimestamp
+
+    exit 1
+}
+
+
+Write-Host ""
 Write-Host "Creating ArgoCD namespace..." -ForegroundColor Cyan
 
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
