@@ -5,18 +5,24 @@ Write-Host "Starting Minikube..." -ForegroundColor Cyan
 minikube start
 
 if ($LASTEXITCODE -ne 0) {
-Write-Host "Minikube start failed. Purging and retrying with Hyper-V..." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Minikube start failed. Retrying once..." -ForegroundColor Yellow
 
-```
-minikube delete --all --purge
-minikube start --driver=hyperv
+    minikube stop
+    minikube start
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Failed to start Minikube." -ForegroundColor Red
-    exit 1
-}
-```
-
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host ""
+        Write-Host "Minikube still failed to start." -ForegroundColor Red
+        Write-Host "The cluster was not deleted automatically." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Diagnostic commands:"
+        Write-Host "  minikube status"
+        Write-Host "  minikube logs"
+        Write-Host ""
+        Write-Host "Use 'minikube delete --all --purge' manually only if you decide to recreate the cluster."
+        exit 1
+    }
 }
 
 Write-Host ""
@@ -85,17 +91,27 @@ kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
 Write-Host ""
 Write-Host "Starting port-forward..." -ForegroundColor Cyan
 
-Start-Process powershell -ArgumentList `    "-NoExit",`
-"-Command", `
-"kubectl port-forward svc/argocd-server -n argocd 8083:443"
+Start-Process powershell -ArgumentList `
+    "-NoExit",
+    "-Command",
+    "kubectl port-forward svc/argocd-server -n argocd 8083:443"
 
 Start-Sleep -Seconds 5
 
 
-$encodedPassword = kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}"
-$password = [System.Text.Encoding]::UTF8.GetString(
-[System.Convert]::FromBase64String($encodedPassword)
-)
+$encodedPassword = kubectl get secret argocd-initial-admin-secret `
+    -n argocd `
+    -o jsonpath="{.data.password}" `
+    2>$null
+
+if ($LASTEXITCODE -eq 0 -and $encodedPassword) {
+    $password = [System.Text.Encoding]::UTF8.GetString(
+        [System.Convert]::FromBase64String($encodedPassword)
+    )
+}
+else {
+    $password = "<existing ArgoCD password>"
+}
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
