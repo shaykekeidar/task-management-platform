@@ -51,7 +51,7 @@ function App() {
 
   useEffect(
     function () {
-      fetchTasks();
+      //fetchTasks();
       fetchCompletedTasks();
       fetchVersions();
     },
