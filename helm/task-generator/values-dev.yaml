@@ -21,7 +21,7 @@ frontend:
       cpu: "500m"
       memory: "512Mi"
   hpa:
-    minReplicas: 1
+    minReplicas: 2
     maxReplicas: 5
     cpuTarget: 50
   pdb:
