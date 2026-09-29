@@ -29,7 +29,9 @@ spec:
       volumes:
         - name: nginx-cache
           emptyDir: {}
-      
+        - name: nginx-run
+          emptyDir: {}
+
       containers:
         - name: frontend
 
@@ -44,6 +46,8 @@ spec:
           volumeMounts:
             - name: nginx-cache
               mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
 
           env:
             - name: FRONTEND_VERSION
