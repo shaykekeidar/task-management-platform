@@ -6,8 +6,6 @@ metadata:
 
 spec:
 
-  serviceAccountName: frontend-sa
-  
   replicas: {{ .Values.frontend.replicas }}
 
   selector:
@@ -20,6 +18,8 @@ spec:
         app: frontend
 
     spec:
+      serviceAccountName: frontend-sa
+      
       containers:
         - name: frontend
 
