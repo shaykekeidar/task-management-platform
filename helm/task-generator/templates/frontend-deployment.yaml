@@ -18,6 +18,17 @@ spec:
         app: frontend
 
     spec:
+
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: frontend
+                topologyKey: kubernetes.io/hostname
+          
       serviceAccountName: frontend-sa
 
       securityContext:
@@ -63,6 +74,8 @@ spec:
           ports:
             - containerPort: 80
 
+          # determines whether a Pod should receive traffic from a Kubernetes Service.
+          # like AWS ALB health check
           readinessProbe:
             httpGet:
               path: /
@@ -70,6 +83,8 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
 
+          # checks whether the container is still functioning.
+          # like ASG/instance health recovery
           livenessProbe:
             httpGet:
               path: /
