@@ -6,7 +6,7 @@ metadata:
 
 spec:
 
-  serviceAccountName: frontend-sa
+  #serviceAccountName: frontend-sa
   
   replicas: {{ .Values.frontend.replicas }}
 
