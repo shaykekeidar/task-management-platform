@@ -28,6 +28,14 @@ spec:
                   matchLabels:
                     app: frontend
                 topologyKey: kubernetes.io/hostname
+
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: frontend
           
       serviceAccountName: frontend-sa
 
