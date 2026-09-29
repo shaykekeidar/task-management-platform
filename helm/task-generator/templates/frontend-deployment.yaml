@@ -6,7 +6,7 @@ metadata:
 
 spec:
 
-  #serviceAccountName: frontend-sa
+  serviceAccountName: frontend-sa
   
   replicas: {{ .Values.frontend.replicas }}
 
@@ -33,7 +33,7 @@ spec:
                   key: FRONTEND_VERSION
 
           ports:
-            - containerPort: 805
+            - containerPort: 80
 
           resources:
             requests:
