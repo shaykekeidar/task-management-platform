@@ -24,6 +24,10 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
+
+      volumes:
+        - name: nginx-cache
+          emptyDir: {}
       
       containers:
         - name: frontend
@@ -35,6 +39,10 @@ spec:
             capabilities:
               drop:
                 - ALL
+          
+          volumeMounts:
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
 
           env:
             - name: FRONTEND_VERSION
