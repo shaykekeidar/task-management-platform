@@ -33,7 +33,7 @@ if (-not $Application) {
     exit 1
 }
 
-$RootPath = "D:\Kubernetes\kub-network-01-starting-setup"
+$RootPath = "D:\Kubernetes\task-management-platform"
 $VersionFile = "$RootPath\app\application-versions.txt"
 
 $Versions = @{}
