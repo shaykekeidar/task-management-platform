@@ -25,6 +25,9 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: "1024"
 
       volumes:
         - name: nginx-cache
