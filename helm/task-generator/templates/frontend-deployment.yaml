@@ -5,6 +5,9 @@ metadata:
   name: frontend-deployment
 
 spec:
+
+  serviceAccountName: frontend-sa
+  
   replicas: {{ .Values.frontend.replicas }}
 
   selector:
