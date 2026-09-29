@@ -19,11 +19,22 @@ spec:
 
     spec:
       serviceAccountName: frontend-sa
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
       
       containers:
         - name: frontend
 
           image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
 
           env:
             - name: FRONTEND_VERSION
