@@ -33,7 +33,7 @@ spec:
                   key: FRONTEND_VERSION
 
           ports:
-            - containerPort: 80
+            - containerPort: 801
 
           resources:
             requests:
