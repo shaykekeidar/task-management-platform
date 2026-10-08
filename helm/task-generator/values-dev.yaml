@@ -51,7 +51,7 @@ auth:
     AUTH_VERSION: "6"
   service:
     port: 80
-    targetPort: 80
+    targetPort: 8080
 
 tasks:
   replicas: 1

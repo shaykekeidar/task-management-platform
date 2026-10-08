@@ -1,15 +1,12 @@
-{{- if .Values.tasks.persistence.hostPathEnabled }}
+{{- if .Values.tasks.persistence.dynamicEnabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ .Values.tasks.persistence.claimName }}
 spec:
-  volumeName: {{ .Values.tasks.persistence.pvName }}
-  storageClassName: {{ .Values.tasks.persistence.storageClassName }}
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.tasks.persistence.storage }}
-
 {{- end }}

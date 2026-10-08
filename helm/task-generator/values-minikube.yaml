@@ -1,5 +1,14 @@
-ingress:
-  enabled: true
+frontend:
+  ingress:
+    enabled: true
 
-route:
-  enabled: false
+  route:
+    enabled: false
+    
+postgres:
+  envStyle: docker
+
+tasks:
+  persistence:
+    hostPathEnabled: true
+    dynamicEnabled: false

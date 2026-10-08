@@ -1,8 +1,20 @@
 platform:
   openshift: true
 
-ingress:
-  enabled: false
+frontend:
+  ingress:
+    enabled: false
 
-route:
-  enabled: true
+  route:
+    enabled: true
+
+postgres:
+  envStyle: openshift
+  image:
+    repository: image-registry.openshift-image-registry.svc:5000/openshift/postgresql
+    tag: "15-el9"
+
+tasks:
+  persistence:
+    hostPathEnabled: false
+    dynamicEnabled: true
