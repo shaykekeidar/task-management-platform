@@ -8,8 +8,11 @@ frontend:
   config:
     FRONTEND_VERSION: "18"
   ingress:
+    enabled: true
     host: task-generator-dev.local
     tlsSecretName: frontend-tls
+  route:
+    enabled: false
   service:
     port: 80
     targetPort: 80

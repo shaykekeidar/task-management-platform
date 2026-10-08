@@ -1,1 +1,5 @@
-x
+ingress:
+  enabled: true
+
+route:
+  enabled: false

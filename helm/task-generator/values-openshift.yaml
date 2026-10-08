@@ -1,1 +1,8 @@
-t
+platform:
+  openshift: true
+
+ingress:
+  enabled: false
+
+route:
+  enabled: true
