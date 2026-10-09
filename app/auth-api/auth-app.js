@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const PORT = process.env.PORT || 80;
 
 app.use(bodyParser.json());
 
@@ -39,4 +40,6 @@ app.get('/version', function (req, res) {
   });
 });
 
-app.listen(80);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Auth service listening on port ${PORT}`);
+});

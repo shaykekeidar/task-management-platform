@@ -1,9 +1,10 @@
 frontend:
   ingress:
     enabled: true
-
   route:
     enabled: false
+  securityContext:
+    fixedUserEnabled: true
     
 postgres:
   envStyle: docker
@@ -17,3 +18,8 @@ tasks:
     claimName: host-pvc-dev
     storageClassName: standard
     hostPath: /data/task-generator-dev/tasks
+
+auth:
+  containerPort: 80
+  service:
+    targetPort: 80

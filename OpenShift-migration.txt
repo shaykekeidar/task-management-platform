@@ -4,3 +4,182 @@ start on 08.10.2026
 2 Create values for minikube and openshift
 
 create platform folder for minikube and for openshift
+
+files to seperate:
+frontend-deployment.yaml Shared — keep, later test SCC compatibility
+frontend-ingress.yaml	Minikube/K8s-specific exposure → disable on OpenShift
+host-pv.yaml	Probably Minikube-specific → don't use on OpenShift
+host-pvc.yaml	Needs review; OpenShift should preferably use dynamic provisioning
+tasks-deployment.yaml	Shared — keep, test SCC compatibility
+tasks-migration-job.yaml	Shared — keep, test SCC compatibility
+users-deployment.yaml	Shared — keep, test SCC compatibility
+
+
+run helm lint . -f values-dev.yaml in the root helm\task-generator
+
+if working, go to the openshift environment:
+
+crc status
+oc whoami
+oc project
+
+create new project:
+oc new-project task-generator-dev
+cd D:\Kubernetes\task-management-platform\helm\task-generator
+
+
+PS D:\Kubernetes\task-management-platform\helm\task-generator> helm upgrade --install task-generator . `
+>>   -f .\values-dev.yaml `
+>>   -f .\values-openshift.yaml `
+>>   -n task-generator-dev
+Release "task-generator" does not exist. Installing it now.
+I1008 20:06:43.255767   36364 warnings.go:107] "Warning: would violate PodSecurity \"restricted:latest\": seccompProfile (pod or container \"frontend\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")"
+NAME: task-generator
+LAST DEPLOYED: Thu Oct  8 20:06:42 2026
+NAMESPACE: task-generator-dev
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+PS D:\Kubernetes\task-management-platform\helm\task-generator> 
+
+in the first run the application will fail due to permissions by the open-OpenShift
+
+NAME                                READY   STATUS              RESTARTS      AGE
+auth-deployment-fd4764c65-sz8fj     0/1     Error               3 (41s ago)   66s
+postgres-0                          0/1     Error               3 (42s ago)   66s
+tasks-deployment-659c59c59b-8dw64   0/1     ContainerCreating   0             66s
+users-deployment-64486d86fc-zpk5b   1/1     Running             0             66s
+
+
+auth:
+PS D:\Kubernetes\task-management-platform\helm\task-generator> oc logs auth-deployment-fd4764c65-sz8fj
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EACCES: permission denied 0.0.0.0:80
+
+fix:
+Route → Service:80 → Pod:8080
+
+
+db:
+
+
+PS D:\Kubernetes\task-management-platform\helm\task-generator> oc logs postgres-0
+chmod: changing permissions of '/var/lib/postgresql/data': Operation not permitted
+chmod: changing permissions of '/var/run/postgresql': Operation not permitted
+
+fix:
+don't use anyuid
+
+PS D:\Kubernetes\task-management-platform\helm\task-generator> oc get pvc
+NAME                          STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS                   VOLUMEATTRIBUTESCLASS   AGE
+host-pvc-dev                  Bound    host-pv-dev                                20Mi       RWO            standard                       <unset>                 18m
+postgres-storage-postgres-0   Bound    pvc-7646c8ce-48d5-4fe3-80ff-6e7fff597734   59Gi       RWO            crc-csi-hostpath-provisioner   <unset>                 18m
+PS D:\Kubernetes\task-management-platform\helm\task-generator> oc get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                                 STORAGECLASS                   VOLUMEATTRIBUTESCLASS   REASON   AGE
+host-pv-dev                                20Mi       RWO            Retain           Bound    task-generator-dev/host-pvc-dev                       standard                       <unset>                          18m
+pvc-151d38e2-6c7b-4844-bfbd-e16ae3f7b712   30Gi       RWX            Retain           Bound    openshift-image-registry/crc-image-registry-storage   crc-csi-hostpath-provisioner   <unset>                          22d
+pvc-7646c8ce-48d5-4fe3-80ff-6e7fff597734   59Gi       RWO            Retain           Bound    task-generator-dev/postgres-storage-postgres-0        crc-csi-hostpath-provisioner   <unset>                          18m
+PS D:\Kubernetes\task-management-platform\helm\task-generator> oc get storageclass
+NAME                                     PROVISIONER                        RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+crc-csi-hostpath-provisioner (default)   kubevirt.io.hostpath-provisioner   Retain          WaitForFirstConsumer   false                  22d
+forlocalhost                             kubernetes.io/no-provisioner       Retain          WaitForFirstConsumer   false                  11h
+PS D:\Kubernetes\task-management-platform\helm\task-generator>
+
+
+he failure is specifically permissions inside that mounted volume:
+OpenShift random UID: 1000670000
+        ↓
+official postgres image starts
+        ↓
+tries chmod on /var/lib/postgresql/data
+        ↓
+Operation not permitted
+
+fix also the pv and the pvc for minikube
+Minikube
+host-pv-dev
+   ↓
+host-pvc-dev
+
+OpenShift
+PVC only
+   ↓
+crc-csi-hostpath-provisioner
+   ↓
+dynamic PV
+
+PS D:\Kubernetes\task-management-platform\helm\task-generator> oc get pod postgres-0 -o jsonpath="{.metadata.annotations.openshift\.io/scc}"
+restricted-v2
+
+Option A — OpenShift-compatible PostgreSQL image
+Use an image designed for arbitrary UID execution.
+
+Option B — adapt/build your own Postgres image
+Prepare writable directories using root-group permissions:
+chgrp -R 0 <directory>
+chmod -R g=u <directory>
+
+
+use different image:
+
+But there is one important change: Red Hat’s PostgreSQL image does not use the same environment variable names as the official Docker image. It expects:
+POSTGRESQL_USER
+POSTGRESQL_PASSWORD
+POSTGRESQL_DATABASE
+
+not:
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_DB
+
+db is fixed
+
+now tasks:
+
+for OpenShift, host-pv.yaml / host-pvc.yaml should not be used.
+
+PS D:\Kubernetes\task-management-platform\helm\task-generator> oc get rs -l app=tasks
+NAME                          DESIRED   CURRENT   READY   AGE
+tasks-deployment-5b9fd6dcd4   1         0         0       6m
+tasks-deployment-659c59c59b   1         1         0       168m
+PS D:\Kubernetes\task-management-platform\helm\task-generator>
+
+The old ReplicaSet is still keeping one Pod alive, and that old Pod is the one referencing host-pvc-dev.
+The new ReplicaSet is the one that should use tasks-pvc-dev, but it has not created a Pod yet.
+
+now I have:
+sdr5" is forbidden: exceeded quota: task-generator-quota, requested: limits.cpu=500m,limits.memory=512Mi, used: limits.cpu=2,limits.memory=2Gi, limited: limits.cpu=2,limits.memory=2Gi
+  Warning  FailedCreate  9m58s                 replicaset-controller  Error creating: pods "tasks-deployment-5b9fd6dcd4-nxdmr" is forbidden: exceeded quota: task-generator-quota, requested: limits.cpu=500m,limits.memory=512Mi, used: limits.cpu=2,limits.memory=2Gi, limited: limits.cpu=2,limits.memory=2Gi
+  Warning  FailedCreate  9m57s                 replicaset-controller  Error creating: pods "tasks-deployment-5b9fd6dcd4-69qz8" is forbidden: exceeded quota: task-generator-quota, requested: limits.cpu=500m,limits.memory=512Mi, used: limits.cpu=2,limits.memory=2Gi, limited: limits.cpu=2,limits.memory=2Gi
+  Warning  FailedCreate  107s (x9 over 9m56s)  replicaset-controller  (combined from similar events): Error creating: pods "tasks-deployment-5b9fd6dcd4-qzjkh" is forbidden: exceeded quota: task-generator-quota, requested: limits.cpu=500m,limits.memory=512Mi, used: limits.cpu=2,limits.memory=2Gi, limited: limits.cpu=2,limits.memory=2Gi
+PS D:\Kubernetes\task-management-platform\helm\task-generator>
+PS D:\Kubernetes\task-management-platform\helm\task-generator>
+PS D:\Kubernetes\task-management-platform\helm\task-generator> oc get rs -l app=auth
+NAME                         DESIRED   CURRENT   READY   AGE
+auth-deployment-5f5d546b85   1         1         0       47m
+auth-deployment-fd4764c65    0         0         0       172m
+PS D:\Kubernetes\task-management-platform\helm\task-generator>
+
+
+With the LimitRange, any container that doesn't specify its own limits gets:
+cpu: 500m
+memory: 512Mi
+
+So just four such containers consume the entire quota:
+4 × 500m   = 2 CPU
+4 × 512Mi  = 2 Gi
+
+That is exactly why the new Tasks Pod was rejected.
+For your Task Generator lab, I would change the quota to:
+
+
+
+
+
+
+
+

@@ -41,9 +41,11 @@ spec:
 
       securityContext:
         runAsNonRoot: true
+        {{- if .Values.frontend.securityContext.fixedUserEnabled }}
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        {{- end }}
         sysctls:
           - name: net.ipv4.ip_unprivileged_port_start # if set to 1024 , will create error due to port under privilage
             value: "0"

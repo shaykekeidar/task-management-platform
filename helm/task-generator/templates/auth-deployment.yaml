@@ -16,4 +16,7 @@ spec:
         - name: auth
           image: "{{ .Values.auth.image.repository }}:{{ .Values.auth.image.tag }}"
           ports:
-            - containerPort: {{ .Values.auth.service.targetPort }}
+            - containerPort: {{ .Values.auth.containerPort }}
+          env:
+            - name: PORT
+              value: {{ .Values.auth.containerPort | quote }}

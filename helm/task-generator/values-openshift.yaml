@@ -4,9 +4,10 @@ platform:
 frontend:
   ingress:
     enabled: false
-
   route:
     enabled: true
+  securityContext:
+    fixedUserEnabled: false
 
 postgres:
   envStyle: openshift
@@ -20,3 +21,8 @@ tasks:
     dynamicEnabled: true
 
     claimName: tasks-pvc-dev
+
+auth:
+  containerPort: 8080
+  service:
+    targetPort: 8080

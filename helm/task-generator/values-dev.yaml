@@ -46,9 +46,9 @@ auth:
   replicas: 1
   image:
     repository: shaykekeidar/kub-demo-auth
-    tag: "6"
+    tag: "7"
   config:
-    AUTH_VERSION: "6"
+    AUTH_VERSION: "7"
   service:
     port: 80
     targetPort: 8080
