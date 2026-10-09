@@ -4,6 +4,14 @@ kind: Deployment
 metadata:
   name: frontend-deployment
 
+  {{- with .Values.platform }}
+  {{- if .openshift }}
+  annotations:
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"frontend:dev"},"fieldPath":"spec.template.spec.containers[?(@.name==\"frontend\")].image"}]
+  {{- end }}
+  {{- end }}
+
 spec:
 
   replicas: {{ .Values.frontend.replicas }}
@@ -30,29 +38,32 @@ spec:
                 topologyKey: kubernetes.io/hostname
 
       topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: ScheduleAnyway
-        labelSelector:
-          matchLabels:
-            app: frontend
-          
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: frontend
+
       serviceAccountName: frontend-sa
 
       securityContext:
         runAsNonRoot: true
+
         {{- if .Values.frontend.securityContext.fixedUserEnabled }}
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
         {{- end }}
+
         sysctls:
-          - name: net.ipv4.ip_unprivileged_port_start # if set to 1024 , will create error due to port under privilage
+          - name: net.ipv4.ip_unprivileged_port_start
             value: "0"
 
       volumes:
         - name: nginx-cache
           emptyDir: {}
+
         - name: nginx-run
           emptyDir: {}
 
@@ -67,10 +78,11 @@ spec:
             capabilities:
               drop:
                 - ALL
-          
+
           volumeMounts:
             - name: nginx-cache
               mountPath: /var/cache/nginx
+
             - name: nginx-run
               mountPath: /var/run
 
