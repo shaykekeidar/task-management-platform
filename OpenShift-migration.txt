@@ -177,6 +177,30 @@ That is exactly why the new Tasks Pod was rejected.
 For your Task Generator lab, I would change the quota to:
 
 
+now the error is:
+
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+frontend-deployment   0/2     0            0           13h
+PS D:\Kubernetes\task-management-platform\helm\task-generator>
+
+oc describe rs frontend-deployment-5474cff484
+
+  Warning  FailedCreate  9m35s (x143 over 13h)  replicaset-controller  Error creating: pods "frontend-deployment-5474cff484-" is forbidden: unable to validate against any security context constraint: [provider "anyuid": Forbidden: not usable by user or serviceaccount, provider restricted-v2: .spec.securityContext.fsGroup: Invalid value: [1000]: 1000 is not an allowed group, provider restricted-v2: .containers[0].runAsUser: Invalid value: 1000: must be in the ranges: [1000670000, 1000679999], provider restricted-v3: .spec.hostUsers: Invalid value: null: Host Users must be set to false, provider "restricted": Forbidden: not usable by user or serviceaccount, provider "nested-container": Forbidden: not usable by user or serviceaccount, provider "nonroot-v2": Forbidden: not usable by user or serviceaccount, provider "nonroot": Forbidden: not usable by user or serviceaccount, provider "hostmount-anyuid": Forbidden: not usable by user or serviceaccount, provider "hostmount-anyuid-v2": Forbidden: not usable by user or serviceaccount, provider "machine-api-termination-handler": Forbidden: not usable by user or serviceaccount, provider "hostnetwork-v2": Forbidden: not usable by user or serviceaccount, provider "hostnetwork": Forbidden: not usable by user or serviceaccount, provider "hostaccess": Forbidden: not usable by user or serviceaccount, provider "hostpath-provisioner": Forbidden: not usable by user or serviceaccount, provider "privileged": Forbidden: not usable by user or serviceaccount]
+PS D:\Kubernetes\task-management-platform\helm\task-generator>
+
+fix was in:
+securityContext:
+  runAsNonRoot: true
+{{- if .Values.frontend.securityContext.fixedUserEnabled }}
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+{{- end }}
+
+
+
+
+
 
 
 
