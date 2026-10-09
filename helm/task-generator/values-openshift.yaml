@@ -18,3 +18,5 @@ tasks:
   persistence:
     hostPathEnabled: false
     dynamicEnabled: true
+
+    claimName: tasks-pvc-dev

@@ -12,3 +12,8 @@ tasks:
   persistence:
     hostPathEnabled: true
     dynamicEnabled: false
+    
+    pvName: host-pv-dev
+    claimName: host-pvc-dev
+    storageClassName: standard
+    hostPath: /data/task-generator-dev/tasks

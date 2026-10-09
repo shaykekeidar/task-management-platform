@@ -64,10 +64,10 @@ tasks:
     port: 8000
     targetPort: 8000
   persistence:
-    pvName: host-pv-dev
+    #pvName: host-pv-dev
     claimName: host-pvc-dev
-    storageClassName: standard
-    hostPath: /data/task-generator-dev/tasks
+    #storageClassName: standard
+    #hostPath: /data/task-generator-dev/tasks
     storage: 20Mi
 postgres:
   image:
