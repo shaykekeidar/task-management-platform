@@ -198,6 +198,10 @@ securityContext:
 {{- end }}
 
 
+image stream ready , remember that it automaticly every 15 minutes
+so run oc import-image frontend:dev
+
+
 
 
 
