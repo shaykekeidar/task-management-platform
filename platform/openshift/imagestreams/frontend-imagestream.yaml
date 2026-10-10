@@ -12,10 +12,10 @@ spec:
 
       from:
         kind: DockerImage
-        name: docker.io/shaykekeidar/kub-demo-frontend:18
+        name: docker.io/shaykekeidar/kub-demo-frontend:dev
 
       importPolicy:
-        scheduled: false
+        scheduled: true
 
       referencePolicy:
         type: Source
