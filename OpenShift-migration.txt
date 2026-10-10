@@ -201,6 +201,55 @@ securityContext:
 image stream ready , remember that it automaticly every 15 minutes
 so run oc import-image frontend:dev
 
+next step: postgresql operator
+
+git checkout -b feature/postgresql-operator-poc
+oc new-project postgres-operator-poc
+
+That is SingleNamespace behavior. OpenShift's documentation uses this same OperatorGroup.targetNamespaces model for namespace-scoped Operator installations.
+installPlanApproval: Manual
+OLM will create the InstallPlan, but it will not install the Operator until we approve it. OpenShift documents exactly this behavior.
+
+PS D:\Kubernetes\task-management-platform> oc apply -f .\platform\openshift\operators\cloudnative-pg\operatorgroup.yaml
+operatorgroup.operators.coreos.com/cloudnative-pg-operator-group created
+PS D:\Kubernetes\task-management-platform>
+PS D:\Kubernetes\task-management-platform> oc apply -f .\platform\openshift\operators\cloudnative-pg\subscription.yaml
+subscription.operators.coreos.com/cloudnative-pg created
+
+
+PS D:\Kubernetes\task-management-platform> oc get operatorgroup -n postgres-operator-poc
+NAME                            AGE
+cloudnative-pg-operator-group   37s
+PS D:\Kubernetes\task-management-platform> oc get installplan -n postgres-operator-poc
+NAME            CSV                      APPROVAL   APPROVED
+install-x9rwz   cloudnative-pg.v1.30.1   Manual     false
+PS D:\Kubernetes\task-management-platform> oc get subscription -n postgres-operator-poc
+NAME             PACKAGE          SOURCE                CHANNEL
+cloudnative-pg   cloudnative-pg   certified-operators   stable-v1
+PS D:\Kubernetes\task-management-platform>
+
+Operators → Installed Operators (or Software Catalog/OperatorHub) → switch project to postgres-operator-poc → open CloudNativePG → Subscription tab → find the pending install plan → Preview InstallPlan → Approve.
+
+PS D:\Kubernetes\task-management-platform\platform\openshift\operators\cloudnative-pg> oc get pods -n postgres-operator-poc  
+NAME                                      READY   STATUS    RESTARTS   AGE
+cnpg-controller-manager-68454c5cf-6r4s9   1/1     Running   0          15m
+postgres-poc-1                            1/1     Running   0          18s
+PS D:\Kubernetes\task-management-platform\platform\openshift\operators\cloudnative-pg> 
+
+You create:
+Cluster CR
+
+Operator creates/manages:
+PostgreSQL Pod
+PVC
+Services
+Secrets
+database lifecycle
+
+
+
+
+
 
 
 
