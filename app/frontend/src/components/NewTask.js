@@ -23,7 +23,7 @@ function NewTask(props) {
   return (
     <form onSubmit={submitForm}>
       <div className='form-control'>
-        <label htmlFor='title'>Title</label>
+        <label htmlFor='title'>Title - test imagestream</label>
         <input
           type='text'
           id='title'
