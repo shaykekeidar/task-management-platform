@@ -1,0 +1,8 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: cloudnative-pg-operator-group
+  namespace: postgres-operator-poc
+spec:
+  targetNamespaces:
+    - postgres-operator-poc
