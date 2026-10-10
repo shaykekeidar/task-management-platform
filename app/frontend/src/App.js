@@ -122,7 +122,7 @@ function App() {
 
         {showVersions && (
           <div>
-            <h3>Application Versions</h3>
+            <h3>Application Versions - test auto change 09:04 - check if update 5 in describe image stream - wait for 15 minutes  </h3>
             <p>Frontend: {versions.frontend || 'unknown'}</p>
             <p>Tasks: {versions.tasks || 'unknown'}</p>
             <p>Users: {versions.users || 'unknown'}</p>
