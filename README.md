@@ -1,25 +1,36 @@
+
 # Task Management Platform
 
-Cloud-native application platform demonstrating:
+A hands-on Kubernetes and OpenShift platform for deploying and operating a containerized task management application.
 
+The project demonstrates microservices deployment, persistent storage, GitOps, observability, networking, and Kubernetes security through practical infrastructure exercises.
+
+## Technology Stack
+
+### Application
 - React frontend
 - Node.js microservices
-- PostgreSQL
+- PostgreSQL database
 - Docker containerization
-- Kubernetes deployments and services
-- Stateful workloads with PostgreSQL
+
+### Kubernetes Infrastructure
+- Deployments, Services, and Stateful workloads
 - Persistent storage
 - ConfigMaps and Secrets
 - Resource requests and limits
-- ResourceQuota and LimitRange guardrails
+- ResourceQuota and LimitRange
 - Horizontal Pod Autoscaling (HPA)
 - Pod Disruption Budgets (PDB)
 - Kubernetes RBAC and ServiceAccounts
 - NetworkPolicy
 - Ingress and TLS
+
+### Deployment and GitOps
 - Helm packaging and environment-specific values
 - Argo CD
 - GitOps-based continuous delivery
+
+### Observability
 - Prometheus and Grafana monitoring
 - Loki-based centralized logging
 
@@ -27,8 +38,7 @@ Cloud-native application platform demonstrating:
 
 The repository also includes hands-on OpenShift experiments.
 
-### Implemented components
-
+### Implemented Components
 - OpenShift application migration and deployment
 - ImageStream experiments
 - OpenShift Routes
@@ -36,16 +46,20 @@ The repository also includes hands-on OpenShift experiments.
 - PostgreSQL cluster provisioning through a custom resource
 - Operator reconciliation testing
 
-### CloudNativePG validation
+### CloudNativePG Validation
 
-The PostgreSQL Pod was manually deleted to verify the
-Operator's reconciliation behavior.
+The PostgreSQL Pod was manually deleted to verify the Operator's reconciliation behavior.
 
-The Operator recreated the Pod, which subsequently
-returned to the Running and Ready state.
+The Operator recreated the Pod, which subsequently returned to the Running and Ready state.
 
-This exercise demonstrates Kubernetes Operator-based
-workload reconciliation.
+This exercise demonstrates Kubernetes Operator-based workload reconciliation.
 
-Note: Pod recreation does not independently verify
-database persistence, backup, or disaster recovery.
+**Note:** Pod recreation does not independently verify database persistence, backup, or disaster recovery.
+
+## Project Status
+
+This is an evolving hands-on Kubernetes and OpenShift engineering project.
+
+The repository contains practical exercises covering application deployment, GitOps, observability, networking, security, and operator-managed workloads.
+
+The environment is intended for learning, experimentation, and technical demonstrations rather than production deployment.
